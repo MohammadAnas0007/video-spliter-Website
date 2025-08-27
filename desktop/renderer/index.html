@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Splitter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f7f3e9 0%, #ede4d3 30%, #e8dcc6 70%, #f2e9d8 100%);
+      color: #2d2926;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      padding: 3rem;
+      border: 1px solid rgba(139, 92, 46, 0.2);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 25px 50px rgba(139, 92, 46, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(139, 92, 46, 0.3);
+      box-shadow: 0 30px 60px rgba(139, 92, 46, 0.15);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+
+    .muted {
+      color: #6b5b52;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .upload-section {
+      margin-bottom: 2rem;
+    }
+
+    .upload-area {
+      border: 2px dashed rgba(139, 92, 46, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .upload-area:hover {
+      border-color: rgba(139, 92, 46, 0.5);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .upload-area.dragover {
+      border-color: rgba(139, 92, 46, 0.7);
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: rgba(139, 92, 46, 0.6);
+      margin-bottom: 1rem;
+    }
+
+    .upload-text {
+      font-size: 1.2rem;
+      color: #6b5b52;
+      margin-bottom: 1rem;
+    }
+
+    .upload-subtext {
+      font-size: 0.9rem;
+      color: #8b8680;
+    }
+
+    .btn-select-file {
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.2);
+    }
+
+    .btn-select-file:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 46, 0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      color: #3c3530;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"], 
+    select {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(139, 92, 46, 0.2);
+      border-radius: 12px;
+      color: #3c3530;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus, 
+    select:focus {
+      outline: none;
+      border-color: rgba(139, 92, 46, 0.4);
+      box-shadow: 0 0 0 3px rgba(139, 92, 46, 0.1);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 46, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.1);
+    }
+
+    /* Video part buttons styling */
+    .video-part-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+      padding: 0.75rem 1.25rem;
+      background: linear-gradient(135deg, #b8956a 0%, #d4a574 50%, #8b5c2e 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.2);
+      min-width: 120px;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .video-part-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .video-part-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 46, 0.3);
+      background: linear-gradient(135deg, #a6865e 0%, #c49968 50%, #7a4f26 100%);
+    }
+
+    .video-part-btn:hover::before {
+      left: 100%;
+    }
+
+    .video-part-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.2);
+    }
+
+    .video-part-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.1);
+      background: linear-gradient(135deg, #d4c09e 0%, #e8dcc6 50%, #c4a582 100%);
+    }
+
+    .video-part-btn:disabled::before {
+      display: none;
+    }
+
+    /* Success state for downloaded parts */
+    .video-part-btn.downloaded {
+      background: linear-gradient(135deg, #6b8e23 0%, #9acd32 50%, #556b2f 100%);
+      box-shadow: 0 4px 15px rgba(107, 142, 35, 0.2);
+    }
+
+    .video-part-btn.downloaded:hover {
+      background: linear-gradient(135deg, #5a7a1f 0%, #8bb82c 50%, #4a5d29 100%);
+      box-shadow: 0 8px 25px rgba(107, 142, 35, 0.3);
+    }
+
+    /* Downloading state animation */
+    .video-part-btn.downloading {
+      background: linear-gradient(135deg, #d4a574 0%, #f4c2a1 50%, #b8956a 100%);
+      box-shadow: 0 4px 15px rgba(212, 165, 116, 0.3);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* ZIP download button styling */
+    .zip-download-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 1rem 1rem 0;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(139, 92, 46, 0.3);
+      min-width: 180px;
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .zip-download-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .zip-download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(139, 92, 46, 0.4);
+      background: linear-gradient(135deg, #7a4f26 0%, #c49968 50%, #a6865e 100%);
+    }
+
+    .zip-download-btn:hover::before {
+      left: 100%;
+    }
+
+    .zip-download-btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(139, 92, 46, 0.3);
+    }
+
+    .zip-download-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 6px 20px rgba(139, 92, 46, 0.2);
+      background: linear-gradient(135deg, #d4c09e 0%, #e8dcc6 50%, #c4a582 100%);
+    }
+
+    .zip-download-btn:disabled::before {
+      display: none;
+    }
+
+    .zip-download-btn.downloaded {
+      background: linear-gradient(135deg, #6b8e23 0%, #9acd32 50%, #556b2f 100%);
+      box-shadow: 0 6px 20px rgba(107, 142, 35, 0.3);
+    }
+
+    .zip-download-btn.downloaded:hover {
+      background: linear-gradient(135deg, #5a7a1f 0%, #8bb82c 50%, #4a5d29 100%);
+      box-shadow: 0 10px 30px rgba(107, 142, 35, 0.4);
+    }
+
+    .zip-download-btn.downloading {
+      background: linear-gradient(135deg, #d4a574 0%, #f4c2a1 50%, #b8956a 100%);
+      box-shadow: 0 6px 20px rgba(212, 165, 116, 0.3);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    /* Download buttons container */
+    .download-buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .download-section-title {
+      margin: 1.5rem 0 1rem 0;
+      color: #6b5b52;
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: center;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    .progress-container {
+      margin-top: 1rem;
+    }
+
+    .progress {
+      background: rgba(139, 92, 46, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      height: 8px;
+      margin: 10px 0;
+    }
+
+    .bar {
+      background: linear-gradient(90deg, #8b5c2e, #d4a574);
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .status-text {
+      font-size: 0.9rem;
+      color: #6b5b52;
+      text-align: center;
+    }
+
+    .downloads {
+      margin-top: 2rem;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 16px;
+      border: 1px solid rgba(139, 92, 46, 0.15);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(139, 92, 46, 0.1);
+    }
+
+    .downloads h3 {
+      margin: 0 0 1.5rem 0;
+      color: #3c3530;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-align: center;
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .downloads a {
+      display: inline-block;
+      margin: 5px 10px 5px 0;
+      padding: 0.6rem 1.2rem;
+      background: linear-gradient(135deg, #8b5c2e 0%, #d4a574 50%, #b8956a 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .downloads a:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(139, 92, 46, 0.3);
+    }
+
+    .file-info {
+      background: rgba(139, 92, 46, 0.1);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #8b5c2e;
+    }
+
+    .file-name {
+      font-weight: 500;
+      color: #3c3530;
+      margin-bottom: 0.2rem;
+    }
+
+    .file-size {
+      color: #6b5b52;
+      font-size: 0.9rem;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 12px;
+      font-size: 0.9rem;
+      color: #6b5b52;
+      line-height: 1.6;
+      border: 1px solid rgba(139, 92, 46, 0.1);
+    }
+
+    .footer strong {
+      color: #3c3530;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .action-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .container {
+        padding: 0 1rem;
+      }
+      
+      .card {
+        padding: 2rem;
+      }
+      
+      .video-part-btn {
+        min-width: 100px;
+        font-size: 0.85rem;
+        padding: 0.6rem 1rem;
+      }
+      
+      .zip-download-btn {
+        min-width: 150px;
+        font-size: 0.9rem;
+        padding: 0.9rem 1.2rem;
+      }
+      
+      .download-buttons-container {
+        justify-content: center;
+      }
+      
+      .downloads {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>🎬Splittter</h1>
+        <p class="muted">Transform your videos with precision and elegance</p>
+      </div>
+      
+      <form id="uploadForm">
+        <div class="upload-section">
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Drag and drop your video file here</div>
+            <div class="upload-subtext">or</div>
+            <button type="button" class="btn-select-file" id="selectBtn">Select Video File</button>
+          </div>
+          <input type="file" id="videoFile" accept="video/*" class="hidden">
+        </div>
+        
+        <div id="fileInfo" class="file-info hidden">
+          <div class="file-name" id="fileName"></div>
+          <div class="file-size" id="fileSize"></div>
+        </div>
+
+        <div class="grid">
+          <div class="form-group">
+            <label>Intro to remove (sec or mm:ss or hh:mm:ss)</label>
+            <input type="text" id="intro" placeholder="e.g. 30 or 0:30" value="0">
+          </div>
+          <div class="form-group">
+            <label>Outro to remove (sec or mm:ss or hh:mm:ss)</label>
+            <input type="text" id="outro" placeholder="e.g. 60 or 1:00" value="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Clip duration (sec or mm:ss or hh:mm:ss)</label>
+          <input type="text" id="part" placeholder="e.g. 600 or 10:00 or 0:10:00" value="600">
+        </div>
+
+        <div class="form-group">
+          <label>Processing Quality</label>
+          <select id="quality">
+            <option value="fast">Fast (Lower Quality)</option>
+            <option value="medium" selected>Medium (Balanced)</option>
+            <option value="high">High (Best Quality)</option>
+          </select>
+        </div>
+
+        <div class="action-buttons">
+          <button type="submit" class="btn" id="submitBtn">Split Video</button>
+          <div id="progressContainer" class="progress-container hidden">
+            <div class="progress">
+              <div class="bar" id="progressBar" style="width: 0%"></div>
+            </div>
+            <div class="status-text" id="statusText">Ready</div>
+          </div>
+        </div>
+      </form>
+
+      <div id="downloads" class="downloads hidden">
+        <h3>📥 Download Results</h3>
+        <div id="downloadLinks"></div>
+      </div>
+
+      <div class="footer">
+        <strong>💡 Movie Tips:</strong> For 3-hour movies, use 10-15 minute parts (600-900s). 
+        Supports formats like <strong>600</strong>, <strong>10:00</strong>, or <strong>0:10:00</strong>. 
+        Maximum file size: 50GB.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = 'http://localhost:4000';
+    let selectedFile = null;
+    let currentJobId = null;
+    let progressInterval = null;
+
+    // Get DOM elements
+    const uploadArea = document.getElementById('uploadArea');
+    const selectBtn = document.getElementById('selectBtn');
+    const fileInput = document.getElementById('videoFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const form = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const downloads = document.getElementById('downloads');
+    const downloadLinks = document.getElementById('downloadLinks');
+
+    // File selection via button
+    selectBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (window.electronAPI) {
+        selectFileDesktop();
+      } else {
+        fileInput.click();
+      }
+    });
+
+    // File selection via drag and drop area click
+    uploadArea.addEventListener('click', (e) => {
+      // Only trigger if not clicking the select button
+      if (e.target === selectBtn) return;
+      
+      if (window.electronAPI) {
+        selectFileDesktop();
+      } else {
+        fileInput.click();
+      }
+    });
+
+    // Drag and drop events
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      
+      if (e.dataTransfer.files.length > 0) {
+        handleFileSelect(e.dataTransfer.files[0]);
+      }
+    });
+
+    // File input change (for web fallback)
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    // Desktop file selection
+    async function selectFileDesktop() {
+      try {
+        const result = await window.electronAPI.selectFile();
+        if (!result.canceled && result.filePaths.length > 0) {
+          const filePath = result.filePaths[0];
+          
+          // Extract file name from path
+          const fileName = filePath.split('\\').pop() || filePath.split('/').pop();
+          
+          // Get file information using the new API
+          const fileInfo = await window.electronAPI.getFileInfo(filePath);
+          
+          if (fileInfo.success) {
+            const file = {
+              name: fileName,
+              size: fileInfo.size,
+              path: filePath,
+              type: 'video/*',
+              electronFile: true
+            };
+            
+            handleFileSelect(file);
+          } else {
+            alert('Error reading file information: ' + fileInfo.error);
+          }
+        }
+      } catch (error) {
+        console.error('File selection error:', error);
+        alert('Error selecting file: ' + error.message);
+      }
+    }
+
+    function handleFileSelect(file) {
+      selectedFile = file;
+      fileName.textContent = file.name;
+      
+      // For desktop files, show size if available, otherwise show placeholder
+      if (file.size > 0) {
+        fileSize.textContent = formatFileSize(file.size);
+      } else {
+        fileSize.textContent = 'Size will be calculated during upload';
+      }
+      
+      fileInfo.classList.remove('hidden');
+      
+      // Update upload area to show selected file
+      uploadArea.innerHTML = `
+        <div class="upload-icon">✅</div>
+        <div class="upload-text">File Selected: ${file.name}</div>
+        <div class="upload-subtext">Click to select a different file</div>
+        <button type="button" class="btn-select-file" id="selectBtn">Select Different File</button>
+      `;
+      
+      // Re-attach event listener to new button
+      const newSelectBtn = document.getElementById('selectBtn');
+      newSelectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (window.electronAPI) {
+          selectFileDesktop();
+        } else {
+          fileInput.click();
+        }
+      });
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      if (!selectedFile) {
+        alert('Please select a video file first.');
+        return;
+      }
+
+      const formData = new FormData();
+      
+      // Handle desktop vs web file
+      if (selectedFile.electronFile && selectedFile.path) {
+        // Desktop: Send file path to server (server will read the file)
+        try {
+          // Verify file access
+          const streamCheck = await window.electronAPI.createFileStream(selectedFile.path);
+          if (!streamCheck.success) {
+            alert('Error accessing file: ' + streamCheck.error);
+            return;
+          }
+
+          // Create form data with file path instead of file content
+          formData.append('filePath', selectedFile.path);
+          formData.append('fileName', selectedFile.name);
+          formData.append('isDesktopUpload', 'true');
+        } catch (error) {
+          alert('Error accessing file: ' + error.message);
+          return;
+        }
+      } else {
+        // Web: use file object directly
+        formData.append('video', selectedFile);
+      }
+      
+      formData.append('intro', document.getElementById('intro').value);
+      formData.append('outro', document.getElementById('outro').value);
+      formData.append('part', document.getElementById('part').value);
+      formData.append('quality', document.getElementById('quality').value);
+
+      try {
+        submitBtn.disabled = true;
+        progressContainer.classList.remove('hidden');
+        statusText.textContent = 'Uploading...';
+
+        const response = await fetch(`${API}/api/split`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        currentJobId = result.jobId;
+        
+        statusText.textContent = 'Processing...';
+        startProgressTracking();
+
+      } catch (error) {
+        console.error('Upload error:', error);
+        alert('Upload failed: ' + error.message);
+        resetForm();
+      }
+    });
+
+    function startProgressTracking() {
+      if (progressInterval) clearInterval(progressInterval);
+      
+      progressInterval = setInterval(async () => {
+        try {
+          const response = await fetch(`${API}/api/progress/${currentJobId}`);
+          const data = await response.json();
+          
+          progressBar.style.width = data.percent + '%';
+          statusText.textContent = `${data.status} • ${data.percent}%`;
+          
+          if (data.status === 'done') {
+            clearInterval(progressInterval);
+            showDownloads(data.parts, data.zipPath);
+            resetForm();
+          } else if (data.status === 'error') {
+            clearInterval(progressInterval);
+            alert('Processing failed: ' + data.error);
+            resetForm();
+          }
+        } catch (error) {
+          console.error('Progress tracking error:', error);
+        }
+      }, 1000);
+    }
+
+    function showDownloads(parts, zipPath) {
+      downloadLinks.innerHTML = '';
+      
+      if (zipPath) {
+        const zipButton = document.createElement('button');
+        zipButton.textContent = '📦 Download All (ZIP)';
+        zipButton.className = 'zip-download-btn';
+        zipButton.onclick = async () => {
+          try {
+            // Set downloading state
+            zipButton.disabled = true;
+            zipButton.classList.add('downloading');
+            zipButton.textContent = '⏳ Downloading...';
+            
+            // Try electron download first
+            let result;
+            try {
+              result = await window.electronAPI.downloadFile(zipPath, 'clips.zip');
+            } catch (electronError) {
+              console.log('Electron download failed, trying alternative method:', electronError);
+              // Fallback: Open the file URL in browser to trigger download
+              await window.electronAPI.openExternal(zipPath);
+              result = { success: true, method: 'browser' };
+            }
+            
+            // Remove downloading state
+            zipButton.classList.remove('downloading');
+            
+            if (result.success) {
+              if (result.method === 'browser') {
+                statusText.textContent = 'ZIP file opened in browser for download';
+              } else {
+                statusText.textContent = 'ZIP file downloaded to Downloads folder!';
+              }
+              zipButton.textContent = '✅ Downloaded';
+              zipButton.classList.add('downloaded');
+              zipButton.disabled = false;
+            } else {
+              statusText.textContent = 'Download failed: ' + result.error;
+              zipButton.textContent = '📦 Download All (ZIP)';
+              zipButton.disabled = false;
+            }
+          } catch (error) {
+            // Remove downloading state on error
+            zipButton.classList.remove('downloading');
+            statusText.textContent = 'Download failed: ' + error.message;
+            zipButton.textContent = '📦 Download All (ZIP)';
+            zipButton.disabled = false;
+          }
+        };
+        downloadLinks.appendChild(zipButton);
+      }
+      
+      if (parts && parts.length > 0) {
+        const partsTitle = document.createElement('div');
+        partsTitle.className = 'download-section-title';
+        partsTitle.textContent = '🎬 Individual Parts:';
+        downloadLinks.appendChild(partsTitle);
+        
+        const partsContainer = document.createElement('div');
+        partsContainer.className = 'download-buttons-container';
+        
+        parts.forEach((part, i) => {
+          const button = document.createElement('button');
+          button.textContent = `🎬 Part ${i + 1}`;
+          button.className = 'video-part-btn';
+          button.onclick = async () => {
+            try {
+              const fileName = `part_${String(i + 1).padStart(3, '0')}.mp4`;
+              
+              // Set downloading state
+              button.disabled = true;
+              button.classList.add('downloading');
+              button.textContent = '⏳ Downloading...';
+              
+              // Try electron download first
+              let result;
+              try {
+                result = await window.electronAPI.downloadFile(part.url, fileName);
+              } catch (electronError) {
+                console.log('Electron download failed, trying alternative method:', electronError);
+                // Fallback: Open the file URL in browser to trigger download
+                await window.electronAPI.openExternal(part.url);
+                result = { success: true, method: 'browser' };
+              }
+              
+              // Remove downloading state
+              button.classList.remove('downloading');
+              
+              if (result.success) {
+                if (result.method === 'browser') {
+                  statusText.textContent = `Part ${i + 1} opened in browser for download`;
+                } else {
+                  statusText.textContent = `Part ${i + 1} downloaded to Downloads folder!`;
+                }
+                button.textContent = `✅ Part ${i + 1}`;
+                button.classList.add('downloaded');
+                button.disabled = false;
+              } else {
+                statusText.textContent = 'Download failed: ' + result.error;
+                button.textContent = `🎬 Part ${i + 1}`;
+                button.disabled = false;
+              }
+            } catch (error) {
+              // Remove downloading state on error
+              button.classList.remove('downloading');
+              statusText.textContent = 'Download failed: ' + error.message;
+              button.textContent = `🎬 Part ${i + 1}`;
+              button.disabled = false;
+            }
+          };
+          partsContainer.appendChild(button);
+        });
+        
+        downloadLinks.appendChild(partsContainer);
+      }
+      
+      downloads.classList.remove('hidden');
+    }
+
+    function resetForm() {
+      submitBtn.disabled = false;
+      progressContainer.classList.add('hidden');
+      progressBar.style.width = '0%';
+      statusText.textContent = 'Ready';
+    }
+
+    // Initialize upload area on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Reset upload area to initial state
+      uploadArea.innerHTML = `
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">Drag and drop your video file here</div>
+        <div class="upload-subtext">or</div>
+        <button type="button" class="btn-select-file" id="selectBtn">Select Video File</button>
+      `;
+      
+      // Re-attach event listener
+      const newSelectBtn = document.getElementById('selectBtn');
+      newSelectBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (window.electronAPI) {
+          selectFileDesktop();
+        } else {
+          fileInput.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
